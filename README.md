@@ -51,7 +51,7 @@ cd motor-sim-demo
 
 python -m venv .venv
 source .venv/bin/activate
-pip install -U west
+pip install west
 
 cd ..
 west init -l motor-sim-demo

@@ -17,14 +17,22 @@ west build -t run
 
 ## Workspace creation (using this repo's manifest)
 
-This repository provides a `west.yml` pinned to Zephyr v4.3.0.
+This repository includes a `west.yml` manifest pinned to Zephyr v4.3.0. A clean setup looks like:
 
 ```bash
 mkdir -p ~/git/motor-sim-workspace
 cd ~/git/motor-sim-workspace
 
 git clone https://github.com/felipegm88/motor-sim-demo.git
+cd motor-sim-demo
+
+python -m venv .venv
+source .venv/bin/activate
+pip install west
+
+cd ..
 west init -l motor-sim-demo
 west update
 west zephyr-export
+west packages pip --install
 ```

@@ -9,6 +9,8 @@ on:
 jobs:
   tests_and_coverage:
     runs-on: ubuntu-latest
+    env:
+      ZEPHYR_TOOLCHAIN_VARIANT: host
 
     steps:
       - name: Checkout (into motor-sim-demo/)
