@@ -1,5 +1,8 @@
 # motor-sim-demo
 
+[![CI](https://github.com/felipegm88/motor-sim-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/felipegm88/motor-sim-demo/actions/workflows/ci.yml)
+[![Docs](https://github.com/felipegm88/motor-sim-demo/actions/workflows/pages.yml/badge.svg)](https://github.com/felipegm88/motor-sim-demo/actions/workflows/pages.yml)
+
 A small **Zephyr RTOS** demo application that runs on the **`native_sim`** board and simulates a basic motor control loop.
 
 The goal is to keep a compact, readable project that shows common embedded patterns:

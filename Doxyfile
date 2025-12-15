@@ -8,9 +8,10 @@ OUTPUT_DIRECTORY       = doxygen-out
 CREATE_SUBDIRS         = NO
 
 # Input
-INPUT                  = src docs README.md
+INPUT                  = src docs
 RECURSIVE              = YES
 FILE_PATTERNS          = *.c *.h *.md
+EXCLUDE_PATTERNS       = README.md doxygen-out/*
 
 # Use a Markdown file as the main (index) page.
 USE_MDFILE_AS_MAINPAGE = docs/mainpage.md
