@@ -1,0 +1,6 @@
+tests:
+  motor_sim_demo.unit.motor_control:
+    platform_allow: native_sim
+    tags: motor_sim_demo unit motor_control
+    harness: ztest
+
