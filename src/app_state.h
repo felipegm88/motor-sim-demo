@@ -1,3 +1,12 @@
+/**
+ * @file app_state.h
+ * @brief Public API for the shared motor state.
+ *
+ * The app_state module owns the global motor state and exposes a small API to
+ * update and read it. It also provides a sample-ready synchronization
+ * primitive used by other threads.
+ */
+
 #ifndef APP_STATE_H_
 #define APP_STATE_H_
 

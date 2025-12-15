@@ -1,3 +1,11 @@
+/**
+ * @file main.c
+ * @brief Application entry point.
+ *
+ * Initializes the application modules, starts background threads/work items,
+ * and then idles forever.
+ */
+
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>

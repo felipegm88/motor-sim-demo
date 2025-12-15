@@ -1,3 +1,11 @@
+/**
+ * @file fault_monitor.h
+ * @brief Public API for fault monitoring.
+ *
+ * The fault_monitor module periodically evaluates a motor state snapshot and
+ * logs fault conditions.
+ */
+
 #ifndef FAULT_MONITOR_H_
 #define FAULT_MONITOR_H_
 

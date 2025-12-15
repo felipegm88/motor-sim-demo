@@ -65,3 +65,6 @@ release_*/
 
 checkpatch_report.txt
 format_check.txt
+
+# Documentation output
+/doxygen-out/

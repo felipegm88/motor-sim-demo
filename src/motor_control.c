@@ -1,3 +1,11 @@
+/**
+ * @file motor_control.c
+ * @brief Motor control loop implementation.
+ *
+ * Implements the periodic control thread and a simple motor/temperature model
+ * used by the demo.
+ */
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 

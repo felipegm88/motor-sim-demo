@@ -65,7 +65,7 @@ ZTEST(motor_control, test_temperature_clamps_ambient_and_max)
         .temperature_c = 200.0f,
     };
     motor_control_step(&high);
-    /* MAX_TEMP_C en tu código es 130 */
+    /* MAX_TEMP_C in this project is 130. */
     assert_float_near(high.temperature_c, 130.0f, 0.01f, "max clamp");
 }
 

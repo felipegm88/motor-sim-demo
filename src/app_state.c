@@ -1,3 +1,11 @@
+/**
+ * @file app_state.c
+ * @brief Shared motor state implementation.
+ *
+ * Implements the app_state module using a mutex for data protection and a
+ * semaphore to signal new samples. Setpoint updates are broadcast using Zbus.
+ */
+
 #include <errno.h>
 
 #include <zephyr/kernel.h>

@@ -21,7 +21,7 @@ ZTEST(system, test_run_threads_and_work_paths)
         k_msleep(20);
     }
 
-    /* Forzar saturación soft/hard en el thread de motor_control */
+    /* Force soft/hard saturation in the motor_control thread. */
     zassert_equal(app_state_set_setpoint(1500.0f), 0, NULL);
 
     zassert_equal(app_state_update_feedback(1500.0f, 90.0f, 90.0f), 0, NULL);

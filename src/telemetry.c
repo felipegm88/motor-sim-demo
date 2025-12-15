@@ -1,3 +1,11 @@
+/**
+ * @file telemetry.c
+ * @brief Telemetry thread implementation.
+ *
+ * Implements a telemetry thread that waits for new samples from app_state and
+ * logs a snapshot every N samples.
+ */
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 

@@ -1,0 +1,39 @@
+# Doxygen configuration for motor-sim-demo
+# Generated on 2025-12-15
+
+PROJECT_NAME           = "motor-sim-demo"
+PROJECT_BRIEF          = "Zephyr motor simulation demo"
+OUTPUT_DIRECTORY       = doxygen-out
+CREATE_SUBDIRS         = NO
+
+# Input
+INPUT                  = src docs README.md
+RECURSIVE              = YES
+FILE_PATTERNS          = *.c *.h *.md
+USE_MDFILE_AS_MAINPAGE = docs/mainpage.md
+
+# Extraction
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_LOCAL_METHODS  = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+# Warnings
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+
+# Preprocessor
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = NO
+EXPAND_ONLY_PREDEF     = NO
+
+# Output formats
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+
+# Misc
+OPTIMIZE_OUTPUT_FOR_C  = YES
+QUIET                  = NO

@@ -1,3 +1,11 @@
+/**
+ * @file console_shell.c
+ * @brief Shell command handlers.
+ *
+ * Registers shell commands used by the demo to set the target speed and print
+ * the current motor state.
+ */
+
 #include <stdlib.h>
 #include <errno.h>
 

@@ -1,3 +1,11 @@
+/**
+ * @file fault_monitor.c
+ * @brief Fault monitor work item implementation.
+ *
+ * Implements a delayable work handler that periodically evaluates
+ * speed/temperature conditions and logs faults.
+ */
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
