@@ -1,6 +1,6 @@
 # motor-sim-demo
 
-This is a small **Zephyr RTOS** demo that runs on **`native_sim`** and simulates a basic motor control loop.
+This is a small **Zephyr RTOS** demo that runs on `native_sim` and simulates a basic motor control loop.
 
 It is designed to be:
 - small enough to read end-to-end,
