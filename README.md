@@ -1,136 +1,152 @@
 # motor-sim-demo
 
-Small Zephyr RTOS project using the `native_sim` board.
+A small **Zephyr RTOS** demo application that runs on the **`native_sim`** board and simulates a basic motor control loop.
 
-The goal of this repository is to be a compact, out-of-tree Zephyr application that can evolve into a small real-time “control/motor simulation” demo, showcasing RTOS and embedded firmware patterns (threads, synchronization, etc.).
+The goal is to keep a compact, readable project that shows common embedded patterns:
+- module-style C design (small .c/.h units),
+- state ownership and synchronization,
+- threads + workqueue usage,
+- Zephyr shell commands,
+- unit + integration tests with `ztest`,
+- **100% line coverage** for this repository's `src/` (excluding `src/main.c`).
 
-> This project is developed and tested in a Zephyr 4.3 workspace.
-
----
-
-## 1. Prerequisites
-
-You need the basic host tools required by Zephyr (Python, CMake, build tools, compiler, etc.).
-
-Install the host dependencies for your operating system by following the **“Installing prerequisites”** section of the official Zephyr Getting Started guide (Linux, macOS, or Windows):
-
-- Zephyr Getting Started (host dependencies):  
-  https://docs.zephyrproject.org/latest/develop/getting_started/index.html#install-dependencies
-
-You do **not** need to create a Zephyr workspace using that guide; this repository provides its own manifest and workspace layout. For this demo we only build for `native_sim`, so installing the Zephyr SDK is optional.
+> Developed and tested with **Zephyr v4.3.0**.
 
 ---
 
-## 2. Create a workspace and install west
+## Quickstart (build & run)
 
-Pick a directory to use as your Zephyr workspace, for example:
+From a Zephyr workspace where this repo is the application root:
+
+```bash
+west build -b native_sim -p always .
+west build -t run
+```
+
+You should see logs similar to:
 
 ```
-    mkdir -p ~/motor-sim-workspace
-    cd ~/motor-sim-workspace
+Hello from Zephyr motor-sim-demo (native_sim)!
 ```
 
-Create and activate a Python virtual environment (recommended):
+### Shell commands
 
-```
-    python3 -m venv .venv
-    source .venv/bin/activate
+In the console:
 
-    pip install --upgrade pip
-    pip install west
-```
+- `motor_set <rpm>` — set the target speed (0..3000)
+- `motor_info` — print the current motor state snapshot
 
 ---
 
-## 3. Clone this repository and initialize west
+## Workspace setup (recommended)
 
-Clone the application repository inside the workspace:
+This repository includes a `west.yml` manifest pinned to Zephyr v4.3.0. A clean setup looks like:
 
-```
-    cd ~/motor-sim-workspace
-    git clone git@github.com:felipegm88/motor-sim-demo.git
-```
+```bash
+mkdir -p ~/git/motor-sim-workspace
+cd ~/git/motor-sim-workspace
 
-Initialize the west workspace using this repo as the manifest:
+git clone https://github.com/felipegm88/motor-sim-demo.git
+cd motor-sim-demo
 
-```
-    west init -l motor-sim-demo
-```
+python -m venv .venv
+source .venv/bin/activate
+pip install -U west
 
-This creates a `.west/` directory in the workspace root and registers `motor-sim-demo` as the manifest repository.
-
-Fetch Zephyr and any additional projects defined in `west.yml`:
-
-```
-    west update
+cd ..
+west init -l motor-sim-demo
+west update
+west zephyr-export
 ```
 
-Export a Zephyr CMake package:
-
-```
-    west zephyr-export
-```
-
-Install Python dependencies:
-
-```
-    west packages pip --install
-```
+Notes:
+- `native_sim` is a host build, so the Zephyr SDK is optional.
+- If you already have a workspace, you can also just add this repo and build it there.
 
 ---
 
-## 4. Build the demo (`native_sim`)
+## Project structure
 
-From inside the application directory:
-
-```
-    cd ~/motor-sim-workspace/motor-sim-demo
-    west build -b native_sim -s .
-```
-
-Alternatively, from the workspace root:
+Key folders:
 
 ```
-    cd ~/motor-sim-workspace
-    west build -b native_sim motor-sim-demo
+motor-sim-demo/
+├── src/                 # Application code (this is what we target for coverage)
+├── tests/
+│   ├── unit/            # Unit tests per module (ztest)
+│   └── integration/     # System-level tests that exercise threads/work
+├── docs/                # Doxygen markdown pages
+├── west.yml             # Zephyr manifest (pins Zephyr version)
+├── Doxyfile             # Doxygen configuration
+└── prj.conf             # App config for native_sim
 ```
 
-This configures and builds the project for the `native_sim` board, placing build artifacts under `motor-sim-demo/build/`.
+### Modules
+
+- **app_state**: owns the global motor state and provides snapshot/update APIs
+- **motor_control**: periodic control loop thread; simulates dynamics + temperature
+- **telemetry**: thread that waits for samples and periodically logs snapshots
+- **fault_monitor**: delayable work item; checks speed/temp and logs fault flags
+- **console_shell**: `motor_set` and `motor_info` shell commands
 
 ---
 
-## 5. Run the demo
+## Tests
 
-After a successful build, run the `native_sim` executable:
+### Run all tests
 
-```
-    cd ~/motor-sim-workspace/motor-sim-demo
-    ./build/zephyr/zephyr.exe
+```bash
+west twister -T tests -p native_sim -v
 ```
 
-You should see output similar to:
+### Run only unit tests
 
+```bash
+west twister -T tests/unit -p native_sim -v
 ```
-    Hello from Zephyr motor-sim-demo (native_sim)!
-    Tick: 1000 ms
-    Tick: 2000 ms
-    Tick: 3000 ms
-    ...
+
+### Run only integration tests
+
+```bash
+west twister -T tests/integration -p native_sim -v
 ```
+
+Twister will also emit JUnit-style reports under `twister-out/`.
 
 ---
 
-## 6. Project structure
+## Coverage (100% lines for `src/`)
 
-Current layout:
+### Generate coverage data + HTML report
 
-    motor-sim-demo/
-    ├── west.yml          # Zephyr manifest (pulls in zephyr/ at a fixed revision)
-    ├── CMakeLists.txt    # Application CMake entry point
-    ├── prj.conf          # Application configuration for native_sim
-    └── src/
-        └── main.c        # Application entry point
+```bash
+west twister -T tests -p native_sim -v   --outdir twister-out-coverage   --coverage --coverage-tool gcovr --coverage-formats html
+```
 
-The repository is structured as an out-of-tree Zephyr application.
-Future iterations will extend `main.c` into a multi-threaded “motor control simulation” using RTOS primitives (threads, semaphores, workqueues, etc.).
+HTML report:
 
+- `twister-out-coverage/coverage/index.html`
+
+### Terminal summary + CI gate (this repo's code only)
+
+This command filters to **only** the repository's `src/` and excludes `src/main.c` and all tests:
+
+```bash
+gcovr twister-out-coverage   --root .   --filter '^src/'   --exclude '^src/main\.c$'   --exclude '^tests/'   --print-summary   --fail-under-line 100
+```
+
+### What does “branch coverage” mean?
+
+- **Line coverage**: was each line executed at least once?
+- **Branch coverage**: were all outcomes of decisions executed? (e.g., both sides of `if/else`,
+  all `switch` cases, short-circuit paths in `&&`/`||`, etc.)
+
+In embedded-style code there are often defensive error branches that are hard to trigger deterministically
+in CI without fault-injection. For this demo we enforce **100% line coverage** for `src/`.
+
+---
+
+## Documentation
+
+- 📘 Doxygen (API docs): https://felipegm88.github.io/motor-sim-demo/
+- 🛠️ Generate locally: `doxygen Doxyfile` → open `doxygen-out/html/index.html`

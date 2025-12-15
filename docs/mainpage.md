@@ -1,38 +1,44 @@
-# motor-sim-demo
+@page mainpage motor-sim-demo
 
-This repository is a small Zephyr-based demo that simulates a motor control loop.
+This is a small **Zephyr RTOS** demo that runs on **`native_sim`** and simulates a basic motor control loop.
 
-## Modules
+It is designed to be:
+- small enough to read end-to-end,
+- realistic enough to show common embedded patterns,
+- testable (unit + integration),
+- and well documented (Doxygen + Markdown pages).
 
-- **app_state**: Owns the global motor state (setpoint, measured speed, output, temperature). Provides a snapshot API, a sample-ready synchronization primitive, and a Zbus channel for setpoint updates.
-- **motor_control**: Periodic control loop thread. Reads the state, updates output to follow the setpoint, simulates motor dynamics and temperature, and publishes feedback.
-- **telemetry**: Thread that waits for new samples and periodically logs the current snapshot.
-- **fault_monitor**: Delayable work item that periodically checks speed/temperature conditions and logs fault flags.
-- **console_shell**: Shell commands `motor_set <rpm>` and `motor_info` to interact with the demo.
+---
 
-## Tests and coverage
+@section modules Modules
 
-The project includes:
-- **Unit tests** for each module using Zephyr's `ztest`.
-- A **system integration test** that starts the threads/work items and drives the system through typical scenarios.
-- **Line coverage gated at 100% for `src/`** (excluding `src/main.c` and test code).
+- **app_state**: Owns the global motor state (setpoint, measured RPM, output %, temperature). Provides snapshot/update APIs and synchronization.
+- **motor_control**: Periodic control loop thread. Reads state, updates simulated dynamics and temperature, and publishes feedback.
+- **telemetry**: Thread that waits for new samples and periodically logs snapshots.
+- **fault_monitor**: Delayable work item that periodically checks speed/temperature and logs fault flags.
+- **console_shell**: Shell commands `motor_set <rpm>` and `motor_info`.
 
-## Building and running (native_sim)
+---
 
-> Exact steps may depend on your local Zephyr workspace setup.
+@section quickstart Quickstart
 
-- Build the application for `native_sim` and run it.
-- Use the shell commands to change the setpoint and inspect the current state.
+From the repository root in a Zephyr workspace:
 
-## Generating documentation
-
-This project uses Doxygen. From the repository root:
-
-```sh
-doxygen Doxyfile
+```bash
+west build -b native_sim -p always .
+west build -t run
 ```
 
-Then open:
+Shell commands:
 
-- `doxygen-out/html/index.html`
+- `motor_set <rpm>` (0..3000)
+- `motor_info`
 
+---
+
+@section docs More documentation
+
+- @subpage quickstart_page
+- @subpage testing_page
+- @subpage coverage_page
+- @subpage doxygen_page

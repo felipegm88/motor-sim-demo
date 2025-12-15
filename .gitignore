@@ -68,3 +68,6 @@ format_check.txt
 
 # Documentation output
 /doxygen-out/
+twister-out*/
+twister-out-coverage*/
+build/
