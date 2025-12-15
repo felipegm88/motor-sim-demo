@@ -11,14 +11,19 @@
 
 ---
 BasedOnStyle: LLVM
-AlignConsecutiveMacros: AcrossComments
-AllowShortBlocksOnASingleLine: Never
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortEnumsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AttributeMacros:
+AlignConsecutiveMacros: AcrossComments #allign define, even if there comment in between
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Never # all blocks on multiple lines regardless of content
+AllowShortCaseLabelsOnASingleLine: false # don't allow cases to be in the same line.
+AllowShortEnumsOnASingleLine: false #we don't allow enums to go in just one line.
+AllowShortFunctionsOnASingleLine: None #no function is allowed to be in a single line.
+AllowShortIfStatementsOnASingleLine: false #no if statement can be on a single line
+AllowShortLoopsOnASingleLine: false #no loops allowed in single line.
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+PenaltyReturnTypeOnItsOwnLine: 1000000
+AttributeMacros: #Macros that should be handled as attributes
   - __aligned
   - __deprecated
   - __packed
@@ -26,12 +31,15 @@ AttributeMacros:
   - __syscall
   - __syscall_always_inline
   - __subsystem
-BitFieldColonSpacing: After
-BreakBeforeBraces: Linux
-ColumnLimit: 100
-ConstructorInitializerIndentWidth: 8
-ContinuationIndentWidth: 8
-ForEachMacros:
+BinPackArguments: false # Prevents "packing" multiple arguments on the same line when they fit
+BinPackParameters: true # Prevents "packing" multiple parameters on the same line when they fit
+BitFieldColonSpacing: After #space after :, but not before
+BreakBeforeBraces: Linux #follows { format of linux
+AlignAfterOpenBracket: Align
+ColumnLimit: 100 #maximum line lenght
+ConstructorInitializerIndentWidth: 8 #work in C++
+ContinuationIndentWidth: 4 #It controls indentation of continued lines in any context
+ForEachMacros: #Macros to be treated as loops.
   - 'ARRAY_FOR_EACH'
   - 'ARRAY_FOR_EACH_PTR'
   - 'FOR_EACH'
@@ -67,7 +75,7 @@ ForEachMacros:
   - 'Z_FOR_EACH_IDX_FIXED_ARG_EXEC'
   - 'Z_GENLIST_FOR_EACH_CONTAINER'
   - 'Z_GENLIST_FOR_EACH_CONTAINER_SAFE'
-  - 'Z_GENLIST_FOR_EACH_NODE'
+  - 'Z_GENLIST_FOR_EACH_NODE'#include "something.h"
   - 'Z_GENLIST_FOR_EACH_NODE_SAFE'
   - 'STRUCT_SECTION_FOREACH'
   - 'STRUCT_SECTION_FOREACH_ALTERNATE'
@@ -82,12 +90,11 @@ ForEachMacros:
   - 'HTTP_SERVICE_FOREACH_RESOURCE'
   - 'I3C_BUS_FOR_EACH_I3CDEV'
   - 'I3C_BUS_FOR_EACH_I2CDEV'
-  - 'MIN_HEAP_FOREACH'
-IfMacros:
+IfMacros: #macros that should be treated as if statements.
   - 'CHECKIF'
 # Disabled for now, see bug https://github.com/zephyrproject-rtos/zephyr/issues/48520
 #IncludeBlocks: Regroup
-IncludeCategories:
+IncludeCategories: #priority for header files can help avoid compilation issues.
   - Regex: '^".*\.h"$'
     Priority: 0
   - Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype)\.h>$'
@@ -96,15 +103,15 @@ IncludeCategories:
     Priority: 2
   - Regex: '.*'
     Priority: 3
-IndentCaseLabels: false
-IndentGotoLabels: false
-IndentWidth: 8
-InsertBraces: true
-InsertNewlineAtEOF: true
-SpaceBeforeInheritanceColon: False
-SpaceBeforeParens: ControlStatementsExceptControlMacros
-SortIncludes: Never
-UseTab: ForContinuationAndIndentation
+IndentCaseLabels: true #switch cases, indent to improve readability
+IndentGotoLabels: false #labels
+IndentWidth: 4
+TabWidth: 4
+InsertBraces: true # add braces around single line control statements helps to prevent bugs
+SpaceBeforeInheritanceColon: false #works C++
+SpaceBeforeParens: ControlStatementsExceptControlMacros #control statements space before (), control macros no
+SortIncludes: Never # Controls header ordering to prevent dependency-related compilation errors and maintainability issues
+UseTab: Never #we omit using tab, so format look the same in all editors, using 4 spaces instead
 WhitespaceSensitiveMacros:
   - COND_CODE_0
   - COND_CODE_1
@@ -113,4 +120,20 @@ WhitespaceSensitiveMacros:
   - LISTIFY
   - STRINGIFY
   - Z_STRINGIFY
-  - DT_FOREACH_PROP_ELEM_SEP
+
+#Allignment of variable assignments when they are together. this work to improve readability
+AlignConsecutiveAssignments:
+  Enabled: false
+  AcrossEmptyLines: false #empty lines break the allignment
+  AcrossComments: true #comment don't break allignment
+  AlignCompound: true # allign different operatos for example += *=, etc
+
+#Allign structs to the left in order to improve readability
+AlignArrayOfStructures: Left
+
+#Allignment of variable declaration when they are together. this work to improve readability
+AlignConsecutiveDeclarations:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: true
+  AlignFunctionPointers: false
