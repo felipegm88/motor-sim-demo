@@ -28,7 +28,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             ninja-build cmake gperf device-tree-compiler \
-            gcc g++ make
+            gcc g++ make build-essential
 
       - name: Install Python deps
         run: |
