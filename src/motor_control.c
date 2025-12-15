@@ -2,6 +2,7 @@
 #include <zephyr/logging/log.h>
 
 #include "app_state.h"
+#include "motor_control.h"
 
 LOG_MODULE_REGISTER(motor_control, LOG_LEVEL_DBG);
 
@@ -48,6 +49,51 @@ void motor_control_start(void)
     LOG_INF("Thread '%s' started (tid=%p)", MOTOR_CONTROL_THREAD_NAME, (void *)control_tid);
 }
 
+void motor_control_step(struct motor_state *state)
+{
+    /* Simple proportional control based on speed error. */
+    float error = state->setpoint_rpm - state->measured_rpm;
+
+    float step_pct = (error / MOTOR_MAX_RPM) * KP_PERCENT;
+    state->control_output_pct += step_pct;
+
+    if (state->control_output_pct < 0.0f) {
+        state->control_output_pct = 0.0f;
+    } else if (state->control_output_pct > 100.0f) {
+        state->control_output_pct = 100.0f;
+    }
+
+    /* First order motor model: measured_rpm moves towards target_rpm. */
+    float target_rpm = (state->control_output_pct / 100.0f) * MOTOR_MAX_RPM;
+    state->measured_rpm += (target_rpm - state->measured_rpm) * SPEED_FILTER_ALPHA;
+
+    /* Temperature model: heating depends on speed, cooling towards ambient. */
+    float speed_norm = state->measured_rpm / MOTOR_MAX_RPM;
+    if (speed_norm < 0.0f) {
+        speed_norm = -speed_norm;
+    }
+
+    float heating = HEAT_GAIN * speed_norm * speed_norm;
+    float cooling = COOL_GAIN * (state->temperature_c - AMBIENT_TEMP_C);
+    state->temperature_c += (heating - cooling);
+
+    if (state->temperature_c < AMBIENT_TEMP_C) {
+        state->temperature_c = AMBIENT_TEMP_C;
+    }
+    if (state->temperature_c > MAX_TEMP_C) {
+        state->temperature_c = MAX_TEMP_C;
+    }
+
+    /* Temperature-based saturation (safety), actual fault reporting is separate. */
+    if ((state->temperature_c > SOFT_LIMIT_TEMP_C) && (state->control_output_pct > 60.0f)) {
+        state->control_output_pct = 60.0f;
+    }
+
+    if ((state->temperature_c > HARD_LIMIT_TEMP_C) && (state->control_output_pct > 10.0f)) {
+        state->control_output_pct = 10.0f;
+    }
+}
+
 /**
  * @brief Main motor control loop.
  *
@@ -73,55 +119,7 @@ static void control_thread(void *p1, void *p2, void *p3)
             continue;
         }
 
-        /* Simple proportional control based on speed error. */
-        float error = state.setpoint_rpm - state.measured_rpm;
-
-        float step_pct = (error / MOTOR_MAX_RPM) * KP_PERCENT;
-        state.control_output_pct += step_pct;
-
-        if (state.control_output_pct < 0.0f) {
-            state.control_output_pct = 0.0f;
-        } else if (state.control_output_pct > 100.0f) {
-            state.control_output_pct = 100.0f;
-        }
-
-        /* First order motor model: measured_rpm moves towards target_rpm. */
-        float target_rpm = (state.control_output_pct / 100.0f) * MOTOR_MAX_RPM;
-        state.measured_rpm += (target_rpm - state.measured_rpm) * SPEED_FILTER_ALPHA;
-
-        /* Temperature model: heating depends on speed, cooling towards ambient. */
-        float speed_norm = state.measured_rpm / MOTOR_MAX_RPM;
-        if (speed_norm < 0.0f) {
-            speed_norm = -speed_norm;
-        }
-
-        float heating = HEAT_GAIN * speed_norm * speed_norm;
-        float cooling = COOL_GAIN * (state.temperature_c - AMBIENT_TEMP_C);
-        state.temperature_c += (heating - cooling);
-
-        if (state.temperature_c < AMBIENT_TEMP_C) {
-            state.temperature_c = AMBIENT_TEMP_C;
-        }
-        if (state.temperature_c > MAX_TEMP_C) {
-            state.temperature_c = MAX_TEMP_C;
-        }
-
-        /* Temperature-based saturation (safety), actual fault reporting is separate. */
-        if ((state.temperature_c > SOFT_LIMIT_TEMP_C) && (state.control_output_pct > 60.0f)) {
-            state.control_output_pct = 60.0f;
-            LOG_DBG("T[%s] Soft temperature saturation: T=%d C, OUT=%d%%",
-                    MOTOR_CONTROL_THREAD_NAME,
-                    (int)state.temperature_c,
-                    (int)state.control_output_pct);
-        }
-
-        if ((state.temperature_c > HARD_LIMIT_TEMP_C) && (state.control_output_pct > 10.0f)) {
-            state.control_output_pct = 10.0f;
-            LOG_DBG("T[%s] Hard temperature saturation: T=%d C, OUT=%d%%",
-                    MOTOR_CONTROL_THREAD_NAME,
-                    (int)state.temperature_c,
-                    (int)state.control_output_pct);
-        }
+        motor_control_step(&state);
 
         ret = app_state_update_feedback(
             state.measured_rpm, state.control_output_pct, state.temperature_c);

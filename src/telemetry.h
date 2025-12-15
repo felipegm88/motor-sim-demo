@@ -9,4 +9,9 @@
  */
 void telemetry_start(void);
 
+#ifdef MOTOR_SIM_DEMO_UNIT_TEST
+#include <stdbool.h>
+bool telemetry_should_log(int *counter);
+#endif /* MOTOR_SIM_DEMO_UNIT_TEST */
+
 #endif /* TELEMETRY_H_ */

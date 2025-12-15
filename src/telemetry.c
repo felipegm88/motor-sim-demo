@@ -2,6 +2,7 @@
 #include <zephyr/logging/log.h>
 
 #include "app_state.h"
+#include "telemetry.h"
 
 LOG_MODULE_REGISTER(telemetry, LOG_LEVEL_DBG);
 
@@ -22,15 +23,22 @@ void telemetry_start(void)
                                     telemetry_stack,
                                     K_THREAD_STACK_SIZEOF(telemetry_stack),
                                     telemetry_thread,
-                                    NULL, NULL, NULL,
+                                    NULL,
+                                    NULL,
+                                    NULL,
                                     TELEMETRY_THREAD_PRIORITY,
                                     0,
                                     K_NO_WAIT);
 
     (void)k_thread_name_set(telemetry_tid, TELEMETRY_THREAD_NAME);
 
-    LOG_INF("Thread '%s' started (tid=%p)",
-            TELEMETRY_THREAD_NAME, (void *)telemetry_tid);
+    LOG_INF("Thread '%s' started (tid=%p)", TELEMETRY_THREAD_NAME, (void *)telemetry_tid);
+}
+
+bool telemetry_should_log(int *counter)
+{
+    (*counter)++;
+    return ((*counter % 10) == 0);
 }
 
 /**
@@ -51,21 +59,19 @@ static void telemetry_thread(void *p1, void *p2, void *p3)
     while (true) {
         int ret = app_state_wait_for_sample();
         if (ret != 0) {
-            LOG_ERR("T[%s] app_state_wait_for_sample failed: %d",
-                    TELEMETRY_THREAD_NAME, ret);
+            LOG_ERR("T[%s] app_state_wait_for_sample failed: %d", TELEMETRY_THREAD_NAME, ret);
             continue;
         }
 
         /* Reduce log volume by printing every 10th sample. */
-        if (++counter % 10 != 0) {
+        if (!telemetry_should_log(&counter)) {
             continue;
         }
 
         struct motor_state state;
         ret = app_state_get_snapshot(&state);
         if (ret != 0) {
-            LOG_ERR("T[%s] app_state_get_snapshot failed: %d",
-                    TELEMETRY_THREAD_NAME, ret);
+            LOG_ERR("T[%s] app_state_get_snapshot failed: %d", TELEMETRY_THREAD_NAME, ret);
             continue;
         }
 
@@ -77,4 +83,3 @@ static void telemetry_thread(void *p1, void *p2, void *p3)
                 (int)state.temperature_c);
     }
 }
-
