@@ -57,6 +57,7 @@ cd ..
 west init -l motor-sim-demo
 west update
 west zephyr-export
+west packages pip --install
 ```
 
 Notes:

@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  tests_and_coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (into motor-sim-demo/)
+        uses: actions/checkout@v4
+        with:
+          path: motor-sim-demo
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install OS deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build cmake gperf device-tree-compiler \
+            gcc g++ make
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install west gcovr
+
+      - name: Init west workspace + fetch Zephyr
+        run: |
+          west init -l motor-sim-demo
+          west update
+          pip install -r zephyr/scripts/requirements.txt
+
+      - name: Run Twister (native_sim) with coverage
+        working-directory: motor-sim-demo
+        run: |
+          west twister -T tests -p native_sim -v \
+            --outdir twister-out-coverage \
+            --coverage --coverage-tool gcovr --coverage-formats html
+
+      - name: Enforce 100% line coverage for src/
+        working-directory: motor-sim-demo
+        run: |
+          gcovr twister-out-coverage --root . \
+            --filter '^src/' \
+            --exclude '^src/main\.c$' \
+            --exclude '^tests/' \
+            --print-summary \
+            --fail-under-line 100
+
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-html
+          path: motor-sim-demo/twister-out-coverage/coverage
+
+      - name: Upload twister reports
+        uses: actions/upload-artifact@v6
+        with:
+          name: twister-reports
+          path: |
+            motor-sim-demo/twister-out-coverage/twister.xml
+            motor-sim-demo/twister-out-coverage/twister_report.xml
+            motor-sim-demo/twister-out-coverage/twister.json
+
