@@ -28,7 +28,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             ninja-build cmake gperf device-tree-compiler \
-            gcc g++ make build-essential
+            gcc g++ make build-essential libc6-dev linux-libc-dev \
+            ccache dfu-util wget python3-dev python3-venv python3-tk \
+            xz-utils file make gcc-multilib g++-multilib libsdl2-dev libmagic1
 
       - name: Install Python deps
         run: |
