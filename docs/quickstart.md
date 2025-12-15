@@ -1,12 +1,12 @@
-@page quickstart_page Quickstart
+# Quickstart
 
-@section prereq Prerequisites
+## Prerequisites
 
 You need the usual Zephyr host tools (Python, CMake, Ninja/Make, a compiler).
 
 This demo targets **`native_sim`**, so it builds and runs on the host.
 
-@section build Build & run
+## Build and run
 
 From the repository root:
 
@@ -15,7 +15,7 @@ west build -b native_sim -p always .
 west build -t run
 ```
 
-@section workspace Workspace creation (using this repo's manifest)
+## Workspace creation (using this repo's manifest)
 
 This repository provides a `west.yml` pinned to Zephyr v4.3.0.
 

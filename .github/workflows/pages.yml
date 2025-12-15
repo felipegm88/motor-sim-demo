@@ -35,6 +35,12 @@ jobs:
         working-directory: motor-sim-demo
         run: doxygen Doxyfile
 
+      - name: Doxygen version
+        run: doxygen --version
+
+      - name: Disable Jekyll
+        run: touch motor-sim-demo/doxygen-out/html/.nojekyll
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

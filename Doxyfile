@@ -1,8 +1,9 @@
 # Doxygen configuration for motor-sim-demo
-# Generated on 2025-12-15
+# Updated for GitHub Pages compatibility and nicer navigation.
 
 PROJECT_NAME           = "motor-sim-demo"
-PROJECT_BRIEF          = "Zephyr motor simulation demo"
+PROJECT_BRIEF          = "Zephyr motor simulation demo (native_sim)"
+
 OUTPUT_DIRECTORY       = doxygen-out
 CREATE_SUBDIRS         = NO
 
@@ -10,6 +11,8 @@ CREATE_SUBDIRS         = NO
 INPUT                  = src docs README.md
 RECURSIVE              = YES
 FILE_PATTERNS          = *.c *.h *.md
+
+# Use a Markdown file as the main (index) page.
 USE_MDFILE_AS_MAINPAGE = docs/mainpage.md
 
 # Extraction
@@ -29,10 +32,32 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = NO
 EXPAND_ONLY_PREDEF     = NO
 
+# Markdown / docs
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+BUILTIN_STL_SUPPORT    = NO
+
 # Output formats
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 GENERATE_LATEX         = NO
+
+# Navigation / UI
+GENERATE_TREEVIEW      = YES
+HTML_DYNAMIC_MENUS     = YES
+SEARCHENGINE           = YES
+
+# Graphviz (optional but nice)
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+CLASS_DIAGRAMS         = YES
+UML_LOOK               = YES
+
+# Styling
+HTML_EXTRA_STYLESHEET  = docs/doxygen-extra.css
 
 # Misc
 OPTIMIZE_OUTPUT_FOR_C  = YES

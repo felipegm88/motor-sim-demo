@@ -1,4 +1,4 @@
-@page mainpage motor-sim-demo
+# motor-sim-demo
 
 This is a small **Zephyr RTOS** demo that runs on **`native_sim`** and simulates a basic motor control loop.
 
@@ -8,9 +8,7 @@ It is designed to be:
 - testable (unit + integration),
 - and well documented (Doxygen + Markdown pages).
 
----
-
-@section modules Modules
+## Modules
 
 - **app_state**: Owns the global motor state (setpoint, measured RPM, output %, temperature). Provides snapshot/update APIs and synchronization.
 - **motor_control**: Periodic control loop thread. Reads state, updates simulated dynamics and temperature, and publishes feedback.
@@ -18,9 +16,7 @@ It is designed to be:
 - **fault_monitor**: Delayable work item that periodically checks speed/temperature and logs fault flags.
 - **console_shell**: Shell commands `motor_set <rpm>` and `motor_info`.
 
----
-
-@section quickstart Quickstart
+## Quickstart
 
 From the repository root in a Zephyr workspace:
 
@@ -34,11 +30,9 @@ Shell commands:
 - `motor_set <rpm>` (0..3000)
 - `motor_info`
 
----
+## More documentation
 
-@section docs More documentation
-
-- @subpage quickstart_page
-- @subpage testing_page
-- @subpage coverage_page
-- @subpage doxygen_page
+- [Quickstart](quickstart.md)
+- [Testing](testing.md)
+- [Coverage](coverage.md)
+- [Doxygen](doxygen.md)

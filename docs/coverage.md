@@ -1,8 +1,8 @@
-@page coverage_page Coverage
+# Coverage
 
 The repository enforces **100% line coverage** for its own `src/` (excluding `src/main.c`).
 
-@section gen Generate coverage + HTML
+## Generate coverage + HTML
 
 ```bash
 west twister -T tests -p native_sim -v \
@@ -14,7 +14,7 @@ HTML report:
 
 - `twister-out-coverage/coverage/index.html`
 
-@section summary Terminal summary (repo code only)
+## Terminal summary (repo code only)
 
 ```bash
 gcovr twister-out-coverage \
@@ -26,7 +26,7 @@ gcovr twister-out-coverage \
   --fail-under-line 100
 ```
 
-@section branches Branch coverage vs line coverage
+## Branch coverage vs line coverage
 
 - **Line coverage** answers: “Did we execute this line at least once?”
 - **Branch coverage** answers: “Did we execute all outcomes of each decision?” (true/false branches, switch cases, short-circuit paths, etc.)

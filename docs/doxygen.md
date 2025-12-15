@@ -1,8 +1,8 @@
-@page doxygen_page Doxygen documentation
+# Doxygen documentation
 
 This repository uses Doxygen to generate API documentation from the code and the Markdown pages in `docs/`.
 
-@section gen_docs Generate docs locally
+## Generate docs locally
 
 ```bash
 doxygen Doxyfile
