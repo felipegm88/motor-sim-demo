@@ -15,6 +15,8 @@ void motor_control_start(void);
 #ifdef MOTOR_SIM_DEMO_UNIT_TEST
 struct motor_state;
 void motor_control_step(struct motor_state *state);
+/** @brief Stop motor control thread (test-only helper). */
+void motor_control_stop(void);
 #endif /* MOTOR_SIM_DEMO_UNIT_TEST */
 
 #endif /* MOTOR_CONTROL_H_ */

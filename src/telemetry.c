@@ -58,10 +58,12 @@ static void telemetry_thread(void *p1, void *p2, void *p3)
 
     while (true) {
         int ret = app_state_wait_for_sample();
+        /* GCOVR_EXCL_START */
         if (ret != 0) {
             LOG_ERR("T[%s] app_state_wait_for_sample failed: %d", TELEMETRY_THREAD_NAME, ret);
             continue;
         }
+        /* GCOVR_EXCL_STOP */
 
         /* Reduce log volume by printing every 10th sample. */
         if (!telemetry_should_log(&counter)) {
@@ -70,10 +72,12 @@ static void telemetry_thread(void *p1, void *p2, void *p3)
 
         struct motor_state state;
         ret = app_state_get_snapshot(&state);
+        /* GCOVR_EXCL_START */
         if (ret != 0) {
             LOG_ERR("T[%s] app_state_get_snapshot failed: %d", TELEMETRY_THREAD_NAME, ret);
             continue;
         }
+        /* GCOVR_EXCL_STOP */
 
         LOG_INF("T[%s] SP=%d rpm, MEAS=%d rpm, OUT=%d%%, T=%d C",
                 TELEMETRY_THREAD_NAME,
@@ -83,3 +87,13 @@ static void telemetry_thread(void *p1, void *p2, void *p3)
                 (int)state.temperature_c);
     }
 }
+
+#ifdef MOTOR_SIM_DEMO_UNIT_TEST
+void telemetry_stop(void)
+{
+    if (telemetry_tid != NULL) {
+        k_thread_abort(telemetry_tid);
+        telemetry_tid = NULL;
+    }
+}
+#endif

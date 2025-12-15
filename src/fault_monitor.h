@@ -60,6 +60,9 @@ uint32_t fault_monitor_eval(const struct motor_state *state,
                             float soft_temp_c,
                             float hard_temp_c);
 
+/** @brief Stop fault monitor work (test-only helper). */
+void fault_monitor_stop(void);
+
 #endif /* MOTOR_SIM_DEMO_UNIT_TEST */
 
 #endif /* FAULT_MONITOR_H_ */

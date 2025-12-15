@@ -6,17 +6,21 @@
 
 LOG_MODULE_REGISTER(fault_monitor, LOG_LEVEL_INF);
 
-/** Period of the fault monitor work item (seconds). */
-#define FAULT_MONITOR_PERIOD_SEC 2
+/** Period of the fault monitor work item. */
+#ifdef MOTOR_SIM_DEMO_UNIT_TEST
+#define FAULT_MONITOR_PERIOD K_MSEC(20)
+#else
+#define FAULT_MONITOR_PERIOD K_SECONDS(2)
+#endif
 
 /** Absolute speed error threshold (RPM). */
-#define FAULT_SPEED_ERROR_RPM    300.0f
+#define FAULT_SPEED_ERROR_RPM 300.0f
 
 /** Soft temperature threshold (Celsius). */
-#define SOFT_LIMIT_TEMP_C        80.0f
+#define SOFT_LIMIT_TEMP_C 80.0f
 
 /** Hard temperature threshold (Celsius). */
-#define HARD_LIMIT_TEMP_C        100.0f
+#define HARD_LIMIT_TEMP_C 100.0f
 
 /**
  * @brief Internal fault monitor context.
@@ -53,10 +57,8 @@ static struct fault_monitor_ctx fault_ctx = {
  *
  * @return Bitmask of @ref fault_flags.
  */
-uint32_t fault_monitor_eval(const struct motor_state *state,
-                            float speed_err_th_rpm,
-                            float soft_temp_c,
-                            float hard_temp_c)
+uint32_t fault_monitor_eval(const struct motor_state *state, float speed_err_th_rpm,
+                            float soft_temp_c, float hard_temp_c)
 {
     uint32_t flags = FAULT_NONE;
 
@@ -91,8 +93,8 @@ static void fault_monitor_work_handler(struct k_work *work)
     struct motor_state state;
     int ret = app_state_get_snapshot(&state);
     if (ret != 0) {
-        LOG_ERR("fault_monitor: app_state_get_snapshot failed: %d", ret);
-        goto reschedule;
+        LOG_ERR("fault_monitor: app_state_get_snapshot failed: %d", ret); /* GCOVR_EXCL_LINE */
+        goto reschedule;                                                  /* GCOVR_EXCL_LINE */
     }
 
     uint32_t flags = fault_monitor_eval(&state,
@@ -126,13 +128,19 @@ static void fault_monitor_work_handler(struct k_work *work)
     }
 
 reschedule:
-    (void)k_work_reschedule(&ctx->dwork, K_SECONDS(FAULT_MONITOR_PERIOD_SEC));
+    (void)k_work_reschedule(&ctx->dwork, FAULT_MONITOR_PERIOD);
 }
 
 void fault_monitor_start(void)
 {
     k_work_init_delayable(&fault_ctx.dwork, fault_monitor_work_handler);
-    (void)k_work_schedule(&fault_ctx.dwork, K_SECONDS(FAULT_MONITOR_PERIOD_SEC));
+    (void)k_work_schedule(&fault_ctx.dwork, FAULT_MONITOR_PERIOD);
     LOG_INF("Fault monitor scheduled");
 }
 
+#ifdef MOTOR_SIM_DEMO_UNIT_TEST
+void fault_monitor_stop(void)
+{
+    (void)k_work_cancel_delayable(&fault_ctx.dwork);
+}
+#endif

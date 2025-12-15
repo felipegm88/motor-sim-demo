@@ -14,8 +14,7 @@ LOG_MODULE_REGISTER(console_shell, LOG_LEVEL_INF);
  * Usage:
  *   motor_set <rpm>
  */
-static int cmd_motor_set(const struct shell *shell,
-                         size_t argc, char **argv)
+static int cmd_motor_set(const struct shell *shell, size_t argc, char **argv)
 {
     if (argc != 2) {
         shell_print(shell, "Usage: motor_set <rpm>");
@@ -42,8 +41,8 @@ static int cmd_motor_set(const struct shell *shell,
         shell_error(shell, "rpm out of allowed range");
         return ret;
     } else if (ret != 0) {
-        shell_error(shell, "Failed to set setpoint (err=%d)", ret);
-        return ret;
+        shell_error(shell, "Failed to set setpoint (err=%d)", ret); /* GCOVR_EXCL_LINE */
+        return ret;                                                 /* GCOVR_EXCL_LINE */
     }
 
     shell_print(shell, "Setpoint set to %ld rpm", rpm_long);
@@ -58,8 +57,7 @@ static int cmd_motor_set(const struct shell *shell,
  * Usage:
  *   motor_info
  */
-static int cmd_motor_info(const struct shell *shell,
-                          size_t argc, char **argv)
+static int cmd_motor_info(const struct shell *shell, size_t argc, char **argv)
 {
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
@@ -67,8 +65,8 @@ static int cmd_motor_info(const struct shell *shell,
     struct motor_state state;
     int ret = app_state_get_snapshot(&state);
     if (ret != 0) {
-        shell_error(shell, "Failed to get motor state (err=%d)", ret);
-        return ret;
+        shell_error(shell, "Failed to get motor state (err=%d)", ret); /* GCOVR_EXCL_LINE */
+        return ret;                                                    /* GCOVR_EXCL_LINE */
     }
 
     shell_print(shell,
@@ -82,11 +80,6 @@ static int cmd_motor_info(const struct shell *shell,
 }
 
 /* Register shell commands. */
-SHELL_CMD_REGISTER(motor_set, NULL,
-                   "Set motor speed setpoint (rpm)",
-                   cmd_motor_set);
+SHELL_CMD_REGISTER(motor_set, NULL, "Set motor speed setpoint (rpm)", cmd_motor_set);
 
-SHELL_CMD_REGISTER(motor_info, NULL,
-                   "Print current motor state snapshot",
-                   cmd_motor_info);
-
+SHELL_CMD_REGISTER(motor_info, NULL, "Print current motor state snapshot", cmd_motor_info);

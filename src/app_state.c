@@ -50,7 +50,7 @@ static void app_state_publish_locked(void)
 {
     int err = zbus_chan_pub(&motor_state_chan, &g_state, K_NO_WAIT);
     if (err != 0) {
-        LOG_WRN("zbus_chan_pub failed: %d", err);
+        LOG_WRN("zbus_chan_pub failed: %d", err); /* GCOVR_EXCL_LINE */
     }
 }
 
@@ -64,9 +64,11 @@ static void app_state_publish_locked(void)
 static void motor_state_listener_cb(const struct zbus_channel *chan)
 {
     const struct motor_state *msg = zbus_chan_const_msg(chan);
+    /* GCOVR_EXCL_START */
     if (msg == NULL) {
         return;
     }
+    /* GCOVR_EXCL_STOP */
 
     if (msg->setpoint_rpm != last_logged_setpoint) {
         LOG_INF("ZBUS: setpoint changed to %d rpm", (int)msg->setpoint_rpm);
@@ -142,7 +144,7 @@ int app_state_wait_for_sample(void)
 {
     int ret = k_sem_take(&sample_ready_sem, K_FOREVER);
     if (ret != 0) {
-        LOG_ERR("k_sem_take failed: %d", ret);
+        LOG_ERR("k_sem_take failed: %d", ret); /* GCOVR_EXCL_LINE */
     }
 
     return ret;

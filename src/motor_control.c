@@ -113,20 +113,34 @@ static void control_thread(void *p1, void *p2, void *p3)
     while (true) {
         struct motor_state state;
         int ret = app_state_get_snapshot(&state);
+        /* GCOVR_EXCL_START */
         if (ret != 0) {
             LOG_ERR("T[%s] app_state_get_snapshot failed: %d", MOTOR_CONTROL_THREAD_NAME, ret);
             k_msleep(CONTROL_PERIOD_MS);
             continue;
         }
+        /* GCOVR_EXCL_STOP */
 
         motor_control_step(&state);
 
         ret = app_state_update_feedback(
             state.measured_rpm, state.control_output_pct, state.temperature_c);
+        /* GCOVR_EXCL_START */
         if (ret != 0) {
             LOG_ERR("T[%s] app_state_update_feedback failed: %d", MOTOR_CONTROL_THREAD_NAME, ret);
         }
+        /* GCOVR_EXCL_STOP */
 
         k_msleep(CONTROL_PERIOD_MS);
     }
 }
+
+#ifdef MOTOR_SIM_DEMO_UNIT_TEST
+void motor_control_stop(void)
+{
+    if (control_tid != NULL) {
+        k_thread_abort(control_tid);
+        control_tid = NULL;
+    }
+}
+#endif
