@@ -54,4 +54,19 @@ ZTEST(console_shell, test_motor_info_smoke)
     zassert_equal(ret, 0, NULL);
 }
 
+ZTEST(console_shell, test_motor_set_negative)
+{
+    reset_state();
+    int ret = shell_execute_cmd(NULL, "motor_set -1");
+    zassert_equal(ret, -ERANGE, NULL);
+}
+
+ZTEST(console_shell, test_motor_set_extra_arg)
+{
+    reset_state();
+    int ret = shell_execute_cmd(NULL, "motor_set 10 20");
+    zassert_equal(ret, -EINVAL, NULL);
+}
+
+
 ZTEST_SUITE(console_shell, NULL, NULL, NULL, NULL, NULL);

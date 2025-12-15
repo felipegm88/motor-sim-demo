@@ -90,5 +90,19 @@ ZTEST(motor_control, test_soft_and_hard_temp_saturation)
     assert_float_near(hard.control_output_pct, 10.0f, 0.01f, "hard saturation");
 }
 
-ZTEST_SUITE(motor_control, NULL, NULL, NULL, NULL, NULL);
+ZTEST(motor_control, test_negative_measured_rpm_branch)
+{
+    struct motor_state s = {
+        .setpoint_rpm = 0.0f,
+        .measured_rpm = -100.0f, /* force speed_norm < 0 */
+        .control_output_pct = 0.0f,
+        .temperature_c = 25.0f,
+    };
 
+    motor_control_step(&s);
+
+    /* We dont seek exact values, just execute the branch and stay healthy */
+    zassert_true(s.temperature_c >= 25.0f, NULL);
+}
+
+ZTEST_SUITE(motor_control, NULL, NULL, NULL, NULL, NULL);
