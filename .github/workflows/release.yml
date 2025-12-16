@@ -61,7 +61,7 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p dist
-          BIN="build-release/zephyr/zephyr.exe"
+          BIN="build-release/zephyr/motor-sim-demo.exe"
           if [ ! -f "$BIN" ]; then
             echo "Expected binary not found at $BIN"
             exit 1
@@ -71,7 +71,7 @@ jobs:
           TAG="${{ github.ref_name }}"
           OUT="motor-sim-demo_${TAG}_native_sim_${OS}.tar.gz"
 
-          tar -C build-release/zephyr -czf "dist/${OUT}" zephyr.exe
+          tar -C build-release/zephyr -czf "dist/${OUT}" motor-sim-demo.exe
 
           echo "ASSET_PATH=dist/${OUT}" >> $GITHUB_ENV
           echo "ASSET_NAME=${OUT}" >> $GITHUB_ENV
