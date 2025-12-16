@@ -22,9 +22,10 @@ jobs:
       ZEPHYR_TOOLCHAIN_VARIANT: host
 
     steps:
-      - name: Checkout
+      - name: Checkout (into motor-sim-demo/)
         uses: actions/checkout@v4
         with:
+          path: motor-sim-demo
           fetch-depth: 0
 
       - name: Setup Python
