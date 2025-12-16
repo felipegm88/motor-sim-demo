@@ -59,7 +59,7 @@ west build -t run
 You should see logs similar to:
 
 ```
-**uart connected to pseudotty: /dev/pts/3**    <---- info for the shell
+uart connected to pseudotty: /dev/pts/3    <---- info for the shell
 *** Booting Zephyr OS build v4.3.0 ***
 motor-sim-demo starting (native_sim)
 ...
