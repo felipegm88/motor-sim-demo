@@ -53,4 +53,3 @@ ZTEST(app_state, test_get_snapshot_null)
 }
 
 ZTEST_SUITE(app_state, NULL, NULL, NULL, NULL, NULL);
-

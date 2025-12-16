@@ -68,5 +68,4 @@ ZTEST(console_shell, test_motor_set_extra_arg)
     zassert_equal(ret, -EINVAL, NULL);
 }
 
-
 ZTEST_SUITE(console_shell, NULL, NULL, NULL, NULL, NULL);

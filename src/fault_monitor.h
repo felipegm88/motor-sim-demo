@@ -18,13 +18,13 @@
  */
 enum fault_flags {
     /** No fault condition. */
-    FAULT_NONE        = 0,
+    FAULT_NONE = 0,
     /** Absolute speed error exceeds threshold. */
     FAULT_SPEED_ERROR = (1u << 0),
     /** Temperature exceeds soft limit. */
-    FAULT_TEMP_SOFT   = (1u << 1),
+    FAULT_TEMP_SOFT = (1u << 1),
     /** Temperature exceeds hard limit. */
-    FAULT_TEMP_HARD   = (1u << 2),
+    FAULT_TEMP_HARD = (1u << 2),
 };
 
 /**
@@ -63,10 +63,8 @@ void fault_monitor_start(void);
  *
  * @return Bitmask of @ref fault_flags.
  */
-uint32_t fault_monitor_eval(const struct motor_state *state,
-                            float speed_err_th_rpm,
-                            float soft_temp_c,
-                            float hard_temp_c);
+uint32_t fault_monitor_eval(const struct motor_state *state, float speed_err_th_rpm,
+                            float soft_temp_c, float hard_temp_c);
 
 /** @brief Stop fault monitor work (test-only helper). */
 void fault_monitor_stop(void);
@@ -74,4 +72,3 @@ void fault_monitor_stop(void);
 #endif /* MOTOR_SIM_DEMO_UNIT_TEST */
 
 #endif /* FAULT_MONITOR_H_ */
-

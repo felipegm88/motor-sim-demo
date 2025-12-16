@@ -19,4 +19,3 @@ ZTEST(telemetry, test_should_log_every_10_samples)
 }
 
 ZTEST_SUITE(telemetry, NULL, NULL, NULL, NULL, NULL);
-

@@ -7,9 +7,9 @@ ZTEST(fault_monitor, test_no_faults_at_exact_thresholds)
 {
     struct motor_state s = {
         .setpoint_rpm = 1000.0f,
-        .measured_rpm = 700.0f,   /* diff = 300 exact */
+        .measured_rpm = 700.0f, /* diff = 300 exact */
         .control_output_pct = 50.0f,
-        .temperature_c = 80.0f,   /* soft exact */
+        .temperature_c = 80.0f, /* soft exact */
     };
 
     uint32_t flags = fault_monitor_eval(&s, 300.0f, 80.0f, 100.0f);
@@ -20,7 +20,7 @@ ZTEST(fault_monitor, test_speed_fault_abs_branch)
 {
     struct motor_state s = {
         .setpoint_rpm = 1000.0f,
-        .measured_rpm = 1401.0f,  /* |diff| = 401 */
+        .measured_rpm = 1401.0f, /* |diff| = 401 */
         .temperature_c = 25.0f,
     };
 
@@ -53,4 +53,3 @@ ZTEST(fault_monitor, test_hard_temp_sets_hard_and_soft)
 }
 
 ZTEST_SUITE(fault_monitor, NULL, NULL, NULL, NULL, NULL);
-
