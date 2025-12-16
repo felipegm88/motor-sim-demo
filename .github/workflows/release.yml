@@ -55,7 +55,7 @@ jobs:
 
       - name: Init west workspace + fetch Zephyr
         run: |
-          west init -l .
+          west init -l motor-sim-demo
           west update
           pip install -r zephyr/scripts/requirements.txt
 
