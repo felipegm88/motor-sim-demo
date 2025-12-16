@@ -1,0 +1,6 @@
+# Allow only *your* code
++*/motor-sim-demo/src/*
+
+# Skip everything else
+-*
+
