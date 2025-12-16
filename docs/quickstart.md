@@ -39,8 +39,11 @@ west build -t run
 
 You should see logs similar to:
 
-```text
-Hello from Zephyr motor-sim-demo (native_sim)!
+```bash
+uart connected to pseudotty: /dev/pts/3    <---- info for the shell
+*** Booting Zephyr OS build v4.3.0 ***
+motor-sim-demo starting (native_sim)
+...
 ```
 
 ## Shell commands
@@ -49,3 +52,5 @@ In the console:
 
 - `motor_set <rpm>` — set the target speed (0..3000)
 - `motor_info` — print the current motor state snapshot
+
+> details in: [Serial Shell](serial_shell.md)
