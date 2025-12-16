@@ -65,7 +65,6 @@ ZTEST(fault_monitor, test_soft_temp_sets_only_soft)
     zassert_true((flags & FAULT_TEMP_HARD) == 0U, NULL);
 }
 
-
 ZTEST(fault_monitor, test_process_logs_speed_fault_path)
 {
     struct motor_state s = {
@@ -122,7 +121,7 @@ ZTEST(fault_monitor, test_process_returns_when_no_faults)
         .setpoint_rpm = 1000.0f,
         .measured_rpm = 1000.0f, /* diff 0 -> no speed fault */
         .control_output_pct = 10.0f,
-        .temperature_c = 25.0f,  /* bajo soft/hard */
+        .temperature_c = 25.0f, /* bajo soft/hard */
     };
 
     fault_monitor_test_set_log_period_ms(0);
@@ -136,7 +135,7 @@ ZTEST(fault_monitor, test_process_returns_when_rate_limited)
 {
     struct motor_state s = {
         .setpoint_rpm = 1000.0f,
-        .measured_rpm = 0.0f,    /* diff grande -> speed fault */
+        .measured_rpm = 0.0f, /* diff grande -> speed fault */
         .control_output_pct = 80.0f,
         .temperature_c = 25.0f,
     };
