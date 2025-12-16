@@ -25,10 +25,13 @@ LOG_MODULE_REGISTER(fault_monitor, LOG_LEVEL_INF);
 #define FAULT_SPEED_ERROR_RPM 300.0f
 
 /** Soft temperature threshold (Celsius). */
-#define SOFT_LIMIT_TEMP_C 80.0f
+#define SOFT_LIMIT_TEMP_C 60.0f
 
 /** Hard temperature threshold (Celsius). */
-#define HARD_LIMIT_TEMP_C 100.0f
+#define HARD_LIMIT_TEMP_C 70.0f
+
+/** Fault logs interval (msecs). */
+#define FAULT_LOG_PERIOD_MS 10000
 
 /**
  * @brief Internal fault monitor context.
@@ -44,6 +47,8 @@ struct fault_monitor_ctx {
     float soft_temp_threshold_c;
     /** Hard temperature threshold in Celsius. */
     float hard_temp_threshold_c;
+    /** Last time a fault was logged (ms since boot). */
+    int64_t last_log_ms;
 };
 
 /** Single static context for the demo. */
@@ -51,6 +56,7 @@ static struct fault_monitor_ctx fault_ctx = {
     .speed_error_threshold_rpm = FAULT_SPEED_ERROR_RPM,
     .soft_temp_threshold_c = SOFT_LIMIT_TEMP_C,
     .hard_temp_threshold_c = HARD_LIMIT_TEMP_C,
+    .last_log_ms = 0,
 };
 
 /**
@@ -78,11 +84,11 @@ uint32_t fault_monitor_eval(const struct motor_state *state, float speed_err_th_
     if (speed_diff > speed_err_th_rpm) {
         flags |= FAULT_SPEED_ERROR;
     }
-    if (state->temperature_c > soft_temp_c) {
-        flags |= FAULT_TEMP_SOFT;
-    }
+
     if (state->temperature_c > hard_temp_c) {
         flags |= FAULT_TEMP_HARD;
+    } else if (state->temperature_c > soft_temp_c) {
+        flags |= FAULT_TEMP_SOFT;
     }
 
     return flags;
@@ -109,30 +115,33 @@ static void fault_monitor_work_handler(struct k_work *work)
                                         ctx->speed_error_threshold_rpm,
                                         ctx->soft_temp_threshold_c,
                                         ctx->hard_temp_threshold_c);
+    int64_t now_ms = k_uptime_get();
+    bool allow_log = (flags != FAULT_NONE) && ((now_ms - ctx->last_log_ms) >= 10000);
+    if (allow_log) {
+        ctx->last_log_ms = now_ms;
 
-    if (flags & FAULT_SPEED_ERROR) {
-        float diff = state.setpoint_rpm - state.measured_rpm;
-        if (diff < 0.0f) {
-            diff = -diff;
+        if (flags & FAULT_SPEED_ERROR) {
+            float diff = state.setpoint_rpm - state.measured_rpm;
+            if (diff < 0.0f) {
+                diff = -diff;
+            }
+            LOG_WRN("Fault(speed): |SP-MEAS|=%d rpm (OUT=%d%%, T=%d C)",
+                    (int)diff,
+                    (int)state.control_output_pct,
+                    (int)state.temperature_c);
         }
-        LOG_WRN("Fault(speed): |SP-MEAS|=%d rpm (OUT=%d%%, T=%d C)",
-                (int)diff,
-                (int)state.control_output_pct,
-                (int)state.temperature_c);
-    }
 
-    if (flags & FAULT_TEMP_SOFT) {
-        LOG_WRN("Fault(temp soft): T=%d C (OUT=%d%%, SP=%d rpm)",
-                (int)state.temperature_c,
-                (int)state.control_output_pct,
-                (int)state.setpoint_rpm);
-    }
-
-    if (flags & FAULT_TEMP_HARD) {
-        LOG_ERR("Fault(temp hard): T=%d C (OUT=%d%%, SP=%d rpm)",
-                (int)state.temperature_c,
-                (int)state.control_output_pct,
-                (int)state.setpoint_rpm);
+        if (flags & FAULT_TEMP_HARD) {
+            LOG_ERR("Fault(temp hard): T=%d C (OUT=%d%%, SP=%d rpm)",
+                    (int)state.temperature_c,
+                    (int)state.control_output_pct,
+                    (int)state.setpoint_rpm);
+        } else if (flags & FAULT_TEMP_SOFT) {
+            LOG_WRN("Fault(temp soft): T=%d C (OUT=%d%%, SP=%d rpm)",
+                    (int)state.temperature_c,
+                    (int)state.control_output_pct,
+                    (int)state.setpoint_rpm);
+        }
     }
 
 reschedule:

@@ -17,7 +17,7 @@
 LOG_MODULE_REGISTER(app_state, LOG_LEVEL_DBG);
 
 /* Maximum allowed setpoint, should match motor model full scale. */
-#define APP_STATE_MAX_SETPOINT_RPM 3000.0f
+#define APP_STATE_MAX_SETPOINT_RPM 10000.0f
 
 /* Internal global state (owned by this module only). */
 static struct motor_state g_state = {

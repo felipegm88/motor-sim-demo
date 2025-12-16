@@ -19,15 +19,16 @@ LOG_MODULE_REGISTER(motor_control, LOG_LEVEL_DBG);
 
 #define CONTROL_PERIOD_MS 50
 
-#define MOTOR_MAX_RPM     3000.0f
+#define MOTOR_MAX_RPM     10000.0f
 #define AMBIENT_TEMP_C    25.0f
 #define MAX_TEMP_C        130.0f
 #define SOFT_LIMIT_TEMP_C 80.0f
 #define HARD_LIMIT_TEMP_C 100.0f
 
 /* Heat / cooling and dynamic response tuning constants. */
-#define HEAT_GAIN          0.08f
+#define TEMP_NORM_RPM      4000.0f
 #define COOL_GAIN          0.02f
+#define HEAT_GAIN          (COOL_GAIN * 50.0f) /* 1.0f */
 #define SPEED_FILTER_ALPHA 0.2f
 #define KP_PERCENT         10.0f /* proportional effect as % of full output */
 
@@ -75,10 +76,13 @@ void motor_control_step(struct motor_state *state)
     float target_rpm = (state->control_output_pct / 100.0f) * MOTOR_MAX_RPM;
     state->measured_rpm += (target_rpm - state->measured_rpm) * SPEED_FILTER_ALPHA;
 
-    /* Temperature model: heating depends on speed, cooling towards ambient. */
-    float speed_norm = state->measured_rpm / MOTOR_MAX_RPM;
+    /* Temperature normalization model */
+    float speed_norm = state->measured_rpm / TEMP_NORM_RPM;
     if (speed_norm < 0.0f) {
         speed_norm = -speed_norm;
+    }
+    if (speed_norm > 1.0f) {
+        speed_norm = 1.0f;
     }
 
     float heating = HEAT_GAIN * speed_norm * speed_norm;
