@@ -36,3 +36,4 @@ Shell commands:
 - [Testing](testing.md)
 - [Coverage](coverage.md)
 - [Doxygen](doxygen.md)
+- [Serial Shell](serial_shell.md)
