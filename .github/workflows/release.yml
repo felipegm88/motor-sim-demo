@@ -11,12 +11,10 @@ permissions:
 
 jobs:
   build-and-release:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Build on Ubuntu
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
 
     env:
       ZEPHYR_TOOLCHAIN_VARIANT: host
@@ -34,20 +32,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install deps (Ubuntu)
-        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             ninja-build cmake gperf device-tree-compiler \
-            gcc g++ make libc6-dev \
-            python3-dev python3-venv \
-            xz-utils file wget
-
-      - name: Install deps (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install cmake ninja gperf dtc
+            gcc g++ make build-essential libc6-dev linux-libc-dev \
+            ccache dfu-util wget python3-dev python3-venv python3-tk \
+            xz-utils file make gcc-multilib g++-multilib libsdl2-dev libmagic1
 
       - name: Install Python deps
         run: |
