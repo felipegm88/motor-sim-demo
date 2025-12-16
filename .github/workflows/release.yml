@@ -62,7 +62,7 @@ jobs:
 
       - name: Build native_sim
         run: |
-          west build -b native_sim -d build-release --pristine
+          west build -b native_sim -d build-release motor-sim-demo --pristine
           ls -lah build-release/zephyr
 
       - name: Package asset
