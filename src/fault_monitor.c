@@ -53,6 +53,8 @@ struct fault_monitor_ctx {
     float hard_temp_threshold_c;
     /** Last time a fault was logged (ms since boot). */
     int64_t last_log_ms;
+    int64_t log_period_ms;
+    uint32_t last_fault_flags;
 };
 
 /** Single static context for the demo. */
@@ -61,6 +63,8 @@ static struct fault_monitor_ctx fault_ctx = {
     .soft_temp_threshold_c = SOFT_LIMIT_TEMP_C,
     .hard_temp_threshold_c = HARD_LIMIT_TEMP_C,
     .last_log_ms = 0,
+    .log_period_ms = FAULT_LOG_PERIOD_MS,
+    .last_fault_flags = FAULT_NONE,
 };
 
 /**
@@ -98,6 +102,51 @@ uint32_t fault_monitor_eval(const struct motor_state *state, float speed_err_th_
     return flags;
 }
 
+static void fault_monitor_process(struct fault_monitor_ctx *ctx, const struct motor_state *state,
+                                  int64_t now_ms)
+{
+    uint32_t flags = fault_monitor_eval(state,
+                                        ctx->speed_error_threshold_rpm,
+                                        ctx->soft_temp_threshold_c,
+                                        ctx->hard_temp_threshold_c);
+
+    ctx->last_fault_flags = flags;
+
+    if (flags == FAULT_NONE) {
+        return;
+    }
+
+    if ((now_ms - ctx->last_log_ms) < ctx->log_period_ms) {
+        return;
+    }
+
+    /* Speed fault can be reported together with temp faults. */
+    if (flags & FAULT_SPEED_ERROR) {
+        float diff = state->setpoint_rpm - state->measured_rpm;
+        if (diff < 0.0f) {
+            diff = -diff;
+        }
+        LOG_WRN("Fault(speed): |SP-MEAS|=%d rpm (OUT=%d%%, T=%d C)",
+                (int)diff,
+                (int)state->control_output_pct,
+                (int)state->temperature_c);
+    }
+
+    /* If HARD is active, do not show SOFT. */
+    if (flags & FAULT_TEMP_HARD) {
+        LOG_ERR("Fault(temp hard): T=%d C (OUT=%d%%, SP=%d rpm)",
+                (int)state->temperature_c,
+                (int)state->control_output_pct,
+                (int)state->setpoint_rpm);
+    } else if (flags & FAULT_TEMP_SOFT) {
+        LOG_WRN("Fault(temp soft): T=%d C (OUT=%d%%, SP=%d rpm)",
+                (int)state->temperature_c,
+                (int)state->control_output_pct,
+                (int)state->setpoint_rpm);
+    }
+
+    ctx->last_log_ms = now_ms;
+}
 /**
  * @brief Periodic work handler that checks and logs fault conditions.
  *
@@ -115,38 +164,7 @@ static void fault_monitor_work_handler(struct k_work *work)
         goto reschedule;                                                  /* GCOVR_EXCL_LINE */
     }
 
-    uint32_t flags = fault_monitor_eval(&state,
-                                        ctx->speed_error_threshold_rpm,
-                                        ctx->soft_temp_threshold_c,
-                                        ctx->hard_temp_threshold_c);
-    int64_t now_ms = k_uptime_get();
-    bool allow_log = (flags != FAULT_NONE) && ((now_ms - ctx->last_log_ms) >= 10000);
-    if (allow_log) {
-        ctx->last_log_ms = now_ms;
-
-        if (flags & FAULT_SPEED_ERROR) {
-            float diff = state.setpoint_rpm - state.measured_rpm;
-            if (diff < 0.0f) {
-                diff = -diff;
-            }
-            LOG_WRN("Fault(speed): |SP-MEAS|=%d rpm (OUT=%d%%, T=%d C)",
-                    (int)diff,
-                    (int)state.control_output_pct,
-                    (int)state.temperature_c);
-        }
-
-        if (flags & FAULT_TEMP_HARD) {
-            LOG_ERR("Fault(temp hard): T=%d C (OUT=%d%%, SP=%d rpm)",
-                    (int)state.temperature_c,
-                    (int)state.control_output_pct,
-                    (int)state.setpoint_rpm);
-        } else if (flags & FAULT_TEMP_SOFT) {
-            LOG_WRN("Fault(temp soft): T=%d C (OUT=%d%%, SP=%d rpm)",
-                    (int)state.temperature_c,
-                    (int)state.control_output_pct,
-                    (int)state.setpoint_rpm);
-        }
-    }
+    fault_monitor_process(ctx, &state, k_uptime_get());
 
 reschedule:
     (void)k_work_reschedule(&ctx->dwork, FAULT_MONITOR_PERIOD);
@@ -163,5 +181,23 @@ void fault_monitor_start(void)
 void fault_monitor_stop(void)
 {
     (void)k_work_cancel_delayable(&fault_ctx.dwork);
+}
+uint32_t fault_monitor_test_process(const struct motor_state *state, int64_t now_ms)
+{
+    extern struct fault_monitor_ctx fault_ctx; /* o el nombre real de tu ctx global */
+    fault_monitor_process(&fault_ctx, state, now_ms);
+    return fault_ctx.last_fault_flags;
+}
+
+void fault_monitor_test_set_log_period_ms(int64_t ms)
+{
+    extern struct fault_monitor_ctx fault_ctx;
+    fault_ctx.log_period_ms = ms;
+}
+
+void fault_monitor_test_set_last_log_ms(int64_t ms)
+{
+    extern struct fault_monitor_ctx fault_ctx;
+    fault_ctx.last_log_ms = ms;
 }
 #endif

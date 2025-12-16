@@ -68,6 +68,9 @@ uint32_t fault_monitor_eval(const struct motor_state *state, float speed_err_th_
 
 /** @brief Stop fault monitor work (test-only helper). */
 void fault_monitor_stop(void);
+uint32_t fault_monitor_test_process(const struct motor_state *state, int64_t now_ms);
+void fault_monitor_test_set_log_period_ms(int64_t ms);
+void fault_monitor_test_set_last_log_ms(int64_t ms);
 
 #endif /* MOTOR_SIM_DEMO_UNIT_TEST */
 
