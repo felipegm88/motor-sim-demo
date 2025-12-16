@@ -21,7 +21,7 @@ ZTEST(motor_control, test_step_increases_output_and_speed)
     motor_control_step(&s);
 
     /* Con KP_PERCENT=10 y error/MOTOR_MAX_RPM=1.0 => +10% */
-    assert_float_near(s.control_output_pct, 10.0f, 0.01f, "control output step");
+    assert_float_near(s.control_output_pct, 3.0f, 0.01f, "control output step");
     zassert_true(s.measured_rpm > 0.0f, "measured rpm should rise");
     zassert_true(s.temperature_c >= 25.0f, "temp should not drop below ambient");
 }

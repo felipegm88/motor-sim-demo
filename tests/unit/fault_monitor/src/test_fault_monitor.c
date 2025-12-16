@@ -41,15 +41,28 @@ ZTEST(fault_monitor, test_soft_temp_only)
     zassert_true((flags & FAULT_TEMP_HARD) == 0U, NULL);
 }
 
-ZTEST(fault_monitor, test_hard_temp_sets_hard_and_soft)
+ZTEST(fault_monitor, test_hard_temp_sets_only_hard)
 {
     struct motor_state s = {
         .temperature_c = 105.0f,
     };
 
-    uint32_t flags = fault_monitor_eval(&s, 300.0f, 80.0f, 100.0f);
-    zassert_true((flags & FAULT_TEMP_SOFT) != 0U, NULL);
+    uint32_t flags = fault_monitor_eval(&s, 300.0f, 60.0f, 70.0f);
+
     zassert_true((flags & FAULT_TEMP_HARD) != 0U, NULL);
+    zassert_true((flags & FAULT_TEMP_SOFT) == 0U, NULL);
+}
+
+ZTEST(fault_monitor, test_soft_temp_sets_only_soft)
+{
+    struct motor_state s = {
+        .temperature_c = 65.0f,
+    };
+
+    uint32_t flags = fault_monitor_eval(&s, 300.0f, 60.0f, 70.0f);
+
+    zassert_true((flags & FAULT_TEMP_SOFT) != 0U, NULL);
+    zassert_true((flags & FAULT_TEMP_HARD) == 0U, NULL);
 }
 
 ZTEST_SUITE(fault_monitor, NULL, NULL, NULL, NULL, NULL);

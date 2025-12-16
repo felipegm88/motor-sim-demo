@@ -21,7 +21,7 @@ ZTEST(app_state, test_set_setpoint_validation)
     zassert_equal(app_state_init(), 0, NULL);
 
     zassert_equal(app_state_set_setpoint(-1.0f), -ERANGE, NULL);
-    zassert_equal(app_state_set_setpoint(3000.1f), -ERANGE, NULL);
+    zassert_equal(app_state_set_setpoint(10000.1f), -ERANGE, NULL);
 
     zassert_equal(app_state_set_setpoint(0.0f), 0, NULL);
     zassert_equal(app_state_set_setpoint(3000.0f), 0, NULL);

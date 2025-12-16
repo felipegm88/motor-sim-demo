@@ -31,7 +31,11 @@ LOG_MODULE_REGISTER(fault_monitor, LOG_LEVEL_INF);
 #define HARD_LIMIT_TEMP_C 70.0f
 
 /** Fault logs interval (msecs). */
+#ifdef MOTOR_SIM_DEMO_UNIT_TEST
+#define FAULT_LOG_PERIOD_MS 0
+#else
 #define FAULT_LOG_PERIOD_MS 10000
+#endif
 
 /**
  * @brief Internal fault monitor context.
