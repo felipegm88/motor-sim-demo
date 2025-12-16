@@ -34,7 +34,7 @@ LOG_MODULE_REGISTER(motor_sim_main, LOG_LEVEL_INF);
 int main(void)
 {
     /* Banner: single printk, everything else uses LOG_* macros. */
-    //printk("motor-sim-demo starting (native_sim)\n");
+    printk("motor-sim-demo starting (native_sim)\n");
 
     int ret = app_state_init();
     if (ret != 0) {
