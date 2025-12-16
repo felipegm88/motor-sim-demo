@@ -19,29 +19,6 @@ The goal is to keep a compact, readable project that shows common embedded patte
 
 ---
 
-## Quickstart (build & run)
-
-From a Zephyr workspace where this repo is the application root:
-
-```bash
-west build -b native_sim -p always .
-west build -t run
-```
-
-You should see logs similar to:
-
-```
-Hello from Zephyr motor-sim-demo (native_sim)!
-```
-
-### Shell commands
-
-In the console:
-
-- `motor_set <rpm>` — set the target speed (0..3000)
-- `motor_info` — print the current motor state snapshot
-
----
 
 ## Workspace setup (recommended)
 
@@ -67,6 +44,71 @@ Notes:
 - `native_sim` is a host build, so the Zephyr SDK is optional.
 - If you already have a workspace, you can also just add this repo and build it there.
 
+## Quickstart (build & run)
+
+### Run the simulation (Terminal A)
+
+From a Zephyr workspace where this repo is the application root:
+
+```bash
+cd motor-sim-demo/
+west build -b native_sim -p always .
+west build -t run
+```
+
+You should see logs similar to:
+
+```
+uart connected to pseudotty: /dev/pts/3
+*** Booting Zephyr OS build v4.3.0 ***
+motor-sim-demo starting (native_sim)
+...
+```
+
+### Connect to the shell (Terminal B)
+
+> Note: for PTYs the baudrate is not really “used”, but using `115200 8N1` is fine and consistent.
+
+Option A) picocom (recommended)
+
+```
+    picocom -b 115200 /dev/pts/3
+```
+
+Option B) minicom
+
+```
+    minicom -D /dev/pts/3 -b 115200
+```
+
+Option C) screen
+
+```
+    screen /dev/pts/3 115200
+    # exit: Ctrl+A then K
+```
+
+or with any other serial terminal.
+
+### 3) Try the demo commands
+
+Inside the shell:
+
+```
+    help
+    motor_info
+    motor_set 2000
+    motor_info
+```
+
+If you don’t see output immediately, press Enter once or twice.
+
+cmd list for motor:
+
+- `motor_set <rpm>` — set the target speed (0..3000)
+- `motor_info` — print the current motor state snapshot
+
+---
 ---
 
 ## Project structure
