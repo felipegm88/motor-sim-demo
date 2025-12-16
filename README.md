@@ -50,13 +50,11 @@ mkdir -p ~/git/motor-sim-workspace
 cd ~/git/motor-sim-workspace
 
 git clone https://github.com/felipegm88/motor-sim-demo.git
-cd motor-sim-demo
 
 python -m venv .venv
 source .venv/bin/activate
 pip install west
 
-cd ..
 west init -l motor-sim-demo
 west update
 west zephyr-export
