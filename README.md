@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/felipegm88/motor-sim-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/felipegm88/motor-sim-demo/actions/workflows/ci.yml)
 [![Docs](https://github.com/felipegm88/motor-sim-demo/actions/workflows/pages.yml/badge.svg)](https://github.com/felipegm88/motor-sim-demo/actions/workflows/pages.yml)
+[![clang-format](https://github.com/felipegm88/motor-sim-demo/actions/workflows/clang-format.yml/badge.svg?branch=main)](https://github.com/felipegm88/motor-sim-demo/actions/workflows/clang-format.yml)
 
 A small **Zephyr RTOS** demo application that runs on the **`native_sim`** board and simulates a basic motor control loop.
 
